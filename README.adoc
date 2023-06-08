@@ -3,11 +3,11 @@
 |Supported Targets |ESP32 |ESP32-C2 |ESP32-C3 |ESP32-S2 |ESP32-S3
 
 |ESP-IDF 4.x | Yes |?|?|?|?
-|ESP-IDF 5.x | Yes |?|?|?|?
+|ESP-IDF 5.x | Yes |?|YES|?|?
 |===
 
 
-= NMEA2000_esp32 library for ESP32 boards =
+= NMEA2000_esp32 library for ESP32xx boards using twai driver =
 
 Inherited object for use NMEA2000 library for ESP32 Boards.
 See also https://github.com/ttlappalainen/NMEA2000[NMEA2000] library.
@@ -17,44 +17,26 @@ To use this library, you will also need NMEA2000 library.
 The library defines as default Tx pin to GPIO 16 and Rx pint to GPIO 4. You can 
 change these with defines:
 
-  #define ESP32_CAN_TX_PIN GPIO_NUM_16
+  #define ESP32_CAN_TX_PIN GPIO_NUM_5
   #define ESP32_CAN_RX_PIN GPIO_NUM_4
 
-before including NMEA2000_CAN.h or NMEA2000_esp32.h
+before including NMEA2000_CAN.h or NMEA2000_esp32xx.h
 
 == Thanks ==
 
-Thanks to Thomas Barth, barth-dev.de for his implementation of
-ESP32 CAN driver. Instead of using his driver as external driver
-I implemented the code to the NMEA2000_esp32 to avoid conflicts.
+Thanks to Thomas Barth, barth-dev.de and Timo Lappalainen the implementation
+of ESP32 CAN driver. This is based on their work
 
 == Changes ==
-2023-05-23
-- add ESP-IDF v5 support
-
-04.10.2022
-- Add ESP-IDF support
-
-15.11.2020
-- Added CAN reset to CAN_init
-- Fix for ESP32 rev>=2. New chips uses Baud Rate Prescaler Divider (BRP_DIV) bit, which was set on
-  interrupt vector causing invalid baud rate.
-
-05.11.2019
-- Fixed can frame buffer handling. After ESP soft reset can controller could have false data on
-  frame length and cause writing outside of frame buffer.
-
-20.10.2019
-- Fixed pin definition at startup to avoid error frame.
-
-06.04.2014 Initial commit.
+2024-06-08
+- First release, WIP, only tested in RX
 
 == License ==
 
 
-2015-2022 Copyright (c) Kave Oy, www.kave.fi  All right reserved.
+2015-2022 Copyright (c) jiauka, Kave Oy, www.kave.fi  All right reserved.
 
-Author: Timo Lappalainen
+Author: Jaume Clarens
 
 MIT License
 
