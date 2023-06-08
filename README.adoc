@@ -1,0 +1,76 @@
+[cols="1,1,1,1,1,1"]
+|===
+|Supported Targets |ESP32 |ESP32-C2 |ESP32-C3 |ESP32-S2 |ESP32-S3
+
+|ESP-IDF 4.x | Yes |?|?|?|?
+|ESP-IDF 5.x | Yes |?|?|?|?
+|===
+
+
+= NMEA2000_esp32 library for ESP32 boards =
+
+Inherited object for use NMEA2000 library for ESP32 Boards.
+See also https://github.com/ttlappalainen/NMEA2000[NMEA2000] library.
+
+To use this library, you will also need NMEA2000 library.
+
+The library defines as default Tx pin to GPIO 16 and Rx pint to GPIO 4. You can 
+change these with defines:
+
+  #define ESP32_CAN_TX_PIN GPIO_NUM_16
+  #define ESP32_CAN_RX_PIN GPIO_NUM_4
+
+before including NMEA2000_CAN.h or NMEA2000_esp32.h
+
+== Thanks ==
+
+Thanks to Thomas Barth, barth-dev.de for his implementation of
+ESP32 CAN driver. Instead of using his driver as external driver
+I implemented the code to the NMEA2000_esp32 to avoid conflicts.
+
+== Changes ==
+2023-05-23
+- add ESP-IDF v5 support
+
+04.10.2022
+- Add ESP-IDF support
+
+15.11.2020
+- Added CAN reset to CAN_init
+- Fix for ESP32 rev>=2. New chips uses Baud Rate Prescaler Divider (BRP_DIV) bit, which was set on
+  interrupt vector causing invalid baud rate.
+
+05.11.2019
+- Fixed can frame buffer handling. After ESP soft reset can controller could have false data on
+  frame length and cause writing outside of frame buffer.
+
+20.10.2019
+- Fixed pin definition at startup to avoid error frame.
+
+06.04.2014 Initial commit.
+
+== License ==
+
+
+2015-2022 Copyright (c) Kave Oy, www.kave.fi  All right reserved.
+
+Author: Timo Lappalainen
+
+MIT License
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of
+this software and associated documentation files (the "Software"), to deal in
+the Software without restriction, including without limitation the rights to use,
+copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the
+Software, and to permit persons to whom the Software is furnished to do so,
+subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
+INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF
+CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE
+OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
