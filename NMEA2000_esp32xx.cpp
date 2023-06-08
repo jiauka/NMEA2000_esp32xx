@@ -56,7 +56,7 @@ void tNMEA2000_esp32xx::twai_transmit_task(void *arg)
 
   while (1) {
     tCANFrame frame;
-    xQueueReceive(l_pThis->TxQueue,&frame,0);
+    xQueueReceive(l_pThis->TxQueue,&frame,portMAX_DELAY);
     l_pThis->CAN_send_frame(frame);
   }
   vTaskDelete(NULL);
