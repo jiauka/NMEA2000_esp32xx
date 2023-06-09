@@ -1,8 +1,9 @@
 /*
-NMEA2000_esp32.h
+NMEA2000_esp32xx.h
 
 Copyright (c) 2015-2020 Timo Lappalainen, Kave Oy, www.kave.fi
-
+Copyright (c) 2023 Jaume Clarens "jiauka"
+* 
 Permission is hereby granted, free of charge, to any person obtaining a copy of
 this software and associated documentation files (the "Software"), to deal in
 the Software without restriction, including without limitation the rights to use,
@@ -30,7 +31,7 @@ The library sets as default CAN Tx pin to GPIO 16 and CAN Rx pint to GPIO 4. If 
 want to use other pins (I have not tested can any pins be used), add defines e.g.
 #define ESP32_CAN_TX_PIN GPIO_NUM_34
 #define ESP32_CAN_RX_PIN GPIO_NUM_35
-before including NMEA2000_esp32.h or NMEA2000_CAN.h 
+before including NMEA2000_esp32xx.h
 */
 
 #ifndef _NMEA2000_ESP32_H_
@@ -41,6 +42,8 @@ before including NMEA2000_esp32.h or NMEA2000_CAN.h
 #include "driver/gpio.h"
 #include "NMEA2000.h"
 #include "N2kMsg.h"
+
+//#define NMEA2000_ESP32XX_USE_TASKS // Uncomment to use RX and TX tasks, needs around 10K  more memory
 
 #ifndef ESP32_CAN_TX_PIN
 #define ESP32_CAN_TX_PIN GPIO_NUM_5
@@ -77,9 +80,10 @@ protected:
 	CAN_speed_t    speed;	
   gpio_num_t     TxPin;	
   gpio_num_t     RxPin;
+#ifdef NMEA2000_ESP32XX_USE_TASKS
   QueueHandle_t  RxQueue;
   QueueHandle_t  TxQueue;
-
+#endif
 protected:
   void CAN_send_frame(tCANFrame &frame); // Send frame
   void CAN_init();
@@ -89,8 +93,10 @@ protected:
   bool CANOpen();
   bool CANGetFrame(unsigned long &id, unsigned char &len, unsigned char *buf);
   virtual void InitCANFrameBuffers();
+#ifdef NMEA2000_ESP32XX_USE_TASKS
   static void twai_receive_task(void *arg);
   static void twai_transmit_task(void *arg);
+#endif
 
 public:
   tNMEA2000_esp32xx(gpio_num_t _TxPin=ESP32_CAN_TX_PIN,  gpio_num_t _RxPin=ESP32_CAN_RX_PIN);

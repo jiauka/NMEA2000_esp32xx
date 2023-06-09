@@ -2,7 +2,6 @@
 |===
 |Supported Targets |ESP32 |ESP32-C2 |ESP32-C3 |ESP32-S2 |ESP32-S3
 
-|ESP-IDF 4.x | Yes |?|?|?|?
 |ESP-IDF 5.x | Yes |?|YES|?|?
 |===
 
@@ -22,14 +21,18 @@ change these with defines:
 
 before including NMEA2000_CAN.h or NMEA2000_esp32xx.h
 
+A working example can be found at https://github.com/jiauka/NMEA2000-windesp32xx-idf[NMEA2000-windesp32xx-idf] library
+
 == Thanks ==
 
 Thanks to Thomas Barth, barth-dev.de and Timo Lappalainen the implementation
 of ESP32 CAN driver. This is based on their work
 
 == Changes ==
-2024-06-08
+2023-06-08
 - First release, WIP, only tested in RX
+2023-06-09
+- V0.1 working on both ESP32 and ESP32c3
 
 == License ==
 
