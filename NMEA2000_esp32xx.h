@@ -43,7 +43,6 @@ before including NMEA2000_esp32xx.h
 #include "NMEA2000.h"
 #include "N2kMsg.h"
 
-//#define NMEA2000_ESP32XX_USE_TASKS // Uncomment to use RX and TX tasks, needs around 10K  more memory
 
 #ifndef ESP32_CAN_TX_PIN
 #define ESP32_CAN_TX_PIN GPIO_NUM_5
@@ -52,14 +51,7 @@ before including NMEA2000_esp32xx.h
 #define ESP32_CAN_RX_PIN GPIO_NUM_4
 #endif
 
-typedef enum  {
-	CAN_SPEED_100KBPS=100, 				/**< \brief CAN Node runs at 100kBit/s. */
-	CAN_SPEED_125KBPS=125, 				/**< \brief CAN Node runs at 125kBit/s. */
-	CAN_SPEED_250KBPS=250, 				/**< \brief CAN Node runs at 250kBit/s. */
-	CAN_SPEED_500KBPS=500, 				/**< \brief CAN Node runs at 500kBit/s. */
-	CAN_SPEED_800KBPS=800, 				/**< \brief CAN Node runs at 800kBit/s. */
-	CAN_SPEED_1000KBPS=1000				/**< \brief CAN Node runs at 1000kBit/s. */
-}CAN_speed_t;
+#define NMEA2000_MANUAL_TWAI_CONFIG // see https://docs.espressif.com/projects/esp-idf/en/latest/esp32/api-reference/peripherals/twai.html#bit-timing 
 
 class tNMEA2000_esp32xx : public tNMEA2000
 {
@@ -77,13 +69,8 @@ public:
 
 
 protected:
-	CAN_speed_t    speed;	
   gpio_num_t     TxPin;	
   gpio_num_t     RxPin;
-#ifdef NMEA2000_ESP32XX_USE_TASKS
-  QueueHandle_t  RxQueue;
-  QueueHandle_t  TxQueue;
-#endif
 protected:
   void CAN_send_frame(tCANFrame &frame); // Send frame
   void CAN_init();
@@ -92,11 +79,6 @@ protected:
   bool CANSendFrame(unsigned long id, unsigned char len, const unsigned char *buf, bool wait_sent=true);
   bool CANOpen();
   bool CANGetFrame(unsigned long &id, unsigned char &len, unsigned char *buf);
-  virtual void InitCANFrameBuffers();
-#ifdef NMEA2000_ESP32XX_USE_TASKS
-  static void twai_receive_task(void *arg);
-  static void twai_transmit_task(void *arg);
-#endif
 
 public:
   tNMEA2000_esp32xx(gpio_num_t _TxPin=ESP32_CAN_TX_PIN,  gpio_num_t _RxPin=ESP32_CAN_RX_PIN);

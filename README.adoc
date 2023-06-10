@@ -33,6 +33,8 @@ of ESP32 CAN driver. This is based on their work
 - First release, WIP, only tested in RX
 2023-06-09
 - V0.1 working on both ESP32 and ESP32c3
+2023-06-10
+- V0.2 code cleanup
 
 == License ==
 
