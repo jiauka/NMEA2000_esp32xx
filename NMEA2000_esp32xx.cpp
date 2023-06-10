@@ -100,7 +100,7 @@ void tNMEA2000_esp32xx::CAN_init() {
   twai_filter_config_t f_config = TWAI_FILTER_CONFIG_ACCEPT_ALL();
   twai_general_config_t g_config = TWAI_GENERAL_CONFIG_DEFAULT(TxPin, RxPin, TWAI_MODE_NORMAL);
 
-#ifdef NMEA2000_MANUAL_TWAI_CONFIG
+#ifndef NMEA2000_MANUAL_TWAI_CONFIG
 
   t_config = TWAI_TIMING_CONFIG_250KBITS(); // default {.brp = 16, .tseg_1 = 15, .tseg_2 = 4, .sjw = 3, .triple_sampling = false}
 #else // use hand configuration
