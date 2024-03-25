@@ -27,23 +27,19 @@ Thanks to Thomas Barth, barth-dev.de, who has written ESP32 CAN code. To avoid e
 libraries, I implemented his code directly to the NMEA2000_esp32 to avoid extra
 can.h library, which may cause even naming problem.
 */
-
-#include "esp_idf_version.h"
-#include "freertos/FreeRTOS.h"
-#include "freertos/task.h"
-#include "freertos/queue.h"
-#include "freertos/semphr.h"
-#include "esp_err.h"
-#include "esp_log.h"
-#include "driver/twai.h"
 #include "NMEA2000_esp32xx.h"
+
+
+#include "driver/twai.h"
+
+#define LOG_LOCAL_LEVEL ESP_LOG_VERBOSE /* Enable this to show verbose logging for this file only. */
+#include "esp_log.h"
 
 #if !defined(round)
   #include <math.h>
 #endif
-#if CORE_DEBUG_LEVEL >= ESP_LOG_DEBUG
-  static const char *TAG = "TWAI_C3";
-#endif
+
+static const char *TAG = "TWAI";
 
 bool tNMEA2000_esp32xx::CanInUse=false;
 tNMEA2000_esp32xx *pNMEA2000_esp32c3=0;
@@ -53,17 +49,23 @@ tNMEA2000_esp32xx::tNMEA2000_esp32xx(gpio_num_t _TxPin,  gpio_num_t _RxPin) :
 }
 
 //*****************************************************************************
-bool tNMEA2000_esp32xx::CANSendFrame(unsigned long id, unsigned char len, const unsigned char *buf, bool /*wait_sent*/) {
+bool tNMEA2000_esp32xx::CANSendFrame(unsigned long id, unsigned char len, const unsigned char *buf, bool wait_sent) {
   twai_message_t tx_msg;
   tx_msg.flags=0;
   tx_msg.extd=1;  /**< Extended Frame Format (29bit ID) */
-  tx_msg.data_length_code=len>8?8:len;
-
-  tx_msg.dlc_non_comp=len>8?1:0;  /**< Message's Data length code is larger than 8. This will break compliance with ISO 11898-1 */
-  tx_msg.ss=1; /**< Transmit as a Single Shot Transmission. Unused for received. */
+  int send_len = len>8?8:len; // send buffer is only 8 bytes
+  memcpy(tx_msg.data,buf,send_len);
+  tx_msg.data_length_code=send_len;
+  tx_msg.dlc_non_comp=0; // compliance with ISO 11898-1, DLC <= 8
+  tx_msg.ss=1; /**< Transmit as a Single Shot Transmission. */
   tx_msg.identifier=id;
-  memcpy(tx_msg.data,buf,len);
-  return (twai_transmit(&tx_msg, 0)== ESP_OK);
+  
+  esp_err_t err = twai_transmit(&tx_msg, (wait_sent)?2:0);
+  if (err != ESP_OK)
+  {
+    ESP_LOGW(TAG, "twai_transmit error %d", err);
+  }
+  return (err == ESP_OK);
 }
 
 //*****************************************************************************
@@ -96,24 +98,22 @@ bool tNMEA2000_esp32xx::CANGetFrame(unsigned long &id, unsigned char &len, unsig
 
 //*****************************************************************************
 void tNMEA2000_esp32xx::CAN_init() {
-  twai_timing_config_t t_config;
+  twai_timing_config_t t_config = TWAI_TIMING_CONFIG_250KBITS(); // default {.brp = 16, .tseg_1 = 15, .tseg_2 = 4, .sjw = 3, .triple_sampling = false};
   twai_filter_config_t f_config = TWAI_FILTER_CONFIG_ACCEPT_ALL();
   twai_general_config_t g_config = TWAI_GENERAL_CONFIG_DEFAULT(TxPin, RxPin, TWAI_MODE_NORMAL);
-
-#ifndef NMEA2000_MANUAL_TWAI_CONFIG
-
-  t_config = TWAI_TIMING_CONFIG_250KBITS(); // default {.brp = 16, .tseg_1 = 15, .tseg_2 = 4, .sjw = 3, .triple_sampling = false}
-#else // use hand configuration
+  
+#ifdef NMEA2000_MANUAL_TWAI_CONFIG
+// use hand configuration
   t_config.brp =16;
   t_config.tseg_1 =16;
   t_config.tseg_2 =3;
   t_config.sjw =1;
   t_config.triple_sampling=true;
 #endif
-  t_config.triple_sampling=true;
-  ESP_ERROR_CHECK(twai_driver_install(&g_config, &t_config, &f_config));
+
+  ESP_ERROR_CHECK_WITHOUT_ABORT(twai_driver_install(&g_config, &t_config, &f_config));
   ESP_LOGD(TAG, "Driver installed");
-  ESP_ERROR_CHECK(twai_start());
+  ESP_ERROR_CHECK_WITHOUT_ABORT(twai_start());
   ESP_LOGD(TAG, "Driver started");
 
 }

@@ -27,7 +27,7 @@ Thanks to Thomas Barth, barth-dev.de, who has written ESP32 CAN code. To avoid e
 libraries, I implemented his code directly to the NMEA2000_esp32 to avoid extra
 can.h library, which may cause even naming problem. 
 
-The library sets as default CAN Tx pin to GPIO 16 and CAN Rx pint to GPIO 4. If you
+The library sets as default CAN Tx pin to GPIO 5 and CAN Rx pint to GPIO 4. If you
 want to use other pins (I have not tested can any pins be used), add defines e.g.
 #define ESP32_CAN_TX_PIN GPIO_NUM_34
 #define ESP32_CAN_RX_PIN GPIO_NUM_35
@@ -37,8 +37,6 @@ before including NMEA2000_esp32xx.h
 #ifndef _NMEA2000_ESP32_H_
 #define _NMEA2000_ESP32_H_
 
-#include "freertos/FreeRTOS.h"
-#include "freertos/queue.h"
 #include "driver/gpio.h"
 #include "NMEA2000.h"
 #include "N2kMsg.h"
