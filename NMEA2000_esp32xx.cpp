@@ -249,7 +249,7 @@ bool tNMEA2000_esp32xx::startRecovery()
 {
     if (disabled)
         return false;
-    lastRecoveryStart = millis();
+    lastRecoveryStart = N2kMillis();
     esp_err_t rt = twai_driver_uninstall();
     if (rt != ESP_OK)
     {
