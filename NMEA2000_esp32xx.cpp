@@ -48,8 +48,8 @@ can.h library, which may cause even naming problem.
 bool tNMEA2000_esp32xx::CanInUse=false;
 tNMEA2000_esp32xx *pNMEA2000_esp32c3=0;
 //*****************************************************************************
-tNMEA2000_esp32xx::tNMEA2000_esp32xx(gpio_num_t _TxPin,  gpio_num_t _RxPin) :
-  tNMEA2000(), IsOpen(false), TxPin(_TxPin), RxPin(_RxPin) {
+tNMEA2000_esp32xx::tNMEA2000_esp32xx(gpio_num_t _TxPin,  gpio_num_t _RxPin,int _Controller) :
+  tNMEA2000(), IsOpen(false), TxPin(_TxPin), RxPin(_RxPin),Controller(_Controller) {
 }
 
 //*****************************************************************************
@@ -63,7 +63,7 @@ bool tNMEA2000_esp32xx::CANSendFrame(unsigned long id, unsigned char len, const 
   tx_msg.ss=1; /**< Transmit as a Single Shot Transmission. Unused for received. */
   tx_msg.identifier=id;
   memcpy(tx_msg.data,buf,len);
-  return (twai_transmit(&tx_msg, 0)== ESP_OK);
+  return (twai_transmit_v2(Handle,&tx_msg, 0)== ESP_OK);
 }
 
 //*****************************************************************************
@@ -85,7 +85,7 @@ bool tNMEA2000_esp32xx::CANOpen() {
 bool tNMEA2000_esp32xx::CANGetFrame(unsigned long &id, unsigned char &len, unsigned char *buf) {
   bool hasFrame=false;
   twai_message_t rx_msg;
-  if ( twai_receive(&rx_msg, 0)==ESP_OK ) {
+  if ( twai_receive_v2(Handle,&rx_msg, 0)==ESP_OK ) {
     hasFrame=true;
     id=rx_msg.identifier;
     len=rx_msg.data_length_code;
@@ -98,7 +98,7 @@ bool tNMEA2000_esp32xx::CANGetFrame(unsigned long &id, unsigned char &len, unsig
 void tNMEA2000_esp32xx::CAN_init() {
   twai_timing_config_t t_config;
   twai_filter_config_t f_config = TWAI_FILTER_CONFIG_ACCEPT_ALL();
-  twai_general_config_t g_config = TWAI_GENERAL_CONFIG_DEFAULT(TxPin, RxPin, TWAI_MODE_NORMAL);
+  twai_general_config_t g_config = TWAI_GENERAL_CONFIG_DEFAULT_V2(Controller, TxPin, RxPin, TWAI_MODE_NORMAL);
 
 #ifndef NMEA2000_MANUAL_TWAI_CONFIG
 
@@ -111,9 +111,9 @@ void tNMEA2000_esp32xx::CAN_init() {
   t_config.triple_sampling=true;
 #endif
   t_config.triple_sampling=true;
-  ESP_ERROR_CHECK(twai_driver_install(&g_config, &t_config, &f_config));
+  ESP_ERROR_CHECK(twai_driver_install_v2(&g_config, &t_config, &f_config,&Handle));
   ESP_LOGD(TAG, "Driver installed");
-  ESP_ERROR_CHECK(twai_start());
+  ESP_ERROR_CHECK(twai_start_v2(Handle));
   ESP_LOGD(TAG, "Driver started");
 
 }

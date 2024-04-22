@@ -71,6 +71,8 @@ public:
 protected:
   gpio_num_t     TxPin;	
   gpio_num_t     RxPin;
+  int			 Controller;
+  twai_handle_t  Handle;
 protected:
   void CAN_send_frame(tCANFrame &frame); // Send frame
   void CAN_init();
@@ -81,7 +83,7 @@ protected:
   bool CANGetFrame(unsigned long &id, unsigned char &len, unsigned char *buf);
 
 public:
-  tNMEA2000_esp32xx(gpio_num_t _TxPin=ESP32_CAN_TX_PIN,  gpio_num_t _RxPin=ESP32_CAN_RX_PIN);
+  tNMEA2000_esp32xx(gpio_num_t _TxPin=ESP32_CAN_TX_PIN,  gpio_num_t _RxPin=ESP32_CAN_RX_PIN,int _Controller=0);
 
   void InterruptHandler();
 };
