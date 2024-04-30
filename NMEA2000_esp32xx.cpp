@@ -26,6 +26,32 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #include "driver/twai.h"
 
 #define LOGID(id) ((id >> 8) & 0x1ffff)
+
+#include "esp_log.h"
+const char *TAG = "n2k-esp32";
+#if 1 // defined(NMEA2000_DEBUG)
+#define logDebug(level, fmt, args...)                     \
+    do                                                    \
+    {                                                     \
+        int esp_level = ESP_LOG_VERBOSE;                  \
+        if (level == LOG_ERR)                             \
+        {                                                 \
+            esp_level = ESP_LOG_ERROR;                    \
+        }                                                 \
+        else if (level == LOG_INFO)                       \
+        {                                                 \
+            esp_level = ESP_LOG_INFO;                     \
+        }                                                 \
+        else if (level == LOG_DEBUG)                      \
+        {                                                 \
+            esp_level = ESP_LOG_DEBUG;                    \
+        }                                                 \
+        ESP_LOG_LEVEL_LOCAL(esp_level, TAG, fmt, ##args); \
+    } while (0)
+#else
+#define logDebug(level, fmt, args...)
+#endif
+
 static const int TIMEOUT_OFFLINE = 256; // # of timeouts to consider offline
 
 tNMEA2000_esp32xx::tNMEA2000_esp32xx(int _TxPin, int _RxPin, unsigned long recP, unsigned long logP) : tNMEA2000(), RxPin(_RxPin), TxPin(_TxPin)
@@ -108,10 +134,10 @@ bool tNMEA2000_esp32xx::CANGetFrame(unsigned long &id, unsigned char &len, unsig
     len = message.data_length_code;
     if (len > 8)
     {
-        logDebug(LOG_DEBUG, "twai: received invalid message %lld, len %d", LOGID(id), len);
+        logDebug(LOG_DEBUG, "twai: received invalid message %ld, len %d", LOGID(id), len);
         len = 8;
     }
-    logDebug(LOG_MSG, "twai rcv id=%ld,len=%d, ext=%d", LOGID(message.identifier), message.data_length_code, message.extd);
+    logDebug(LOG_MSG, "twai rcv id=%d,len=%d, ext=%d", LOGID(message.identifier), message.data_length_code, message.extd);
     if (!message.rtr)
     {
         memcpy(buf, message.data, message.data_length_code);
