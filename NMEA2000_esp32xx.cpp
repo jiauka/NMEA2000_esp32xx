@@ -150,6 +150,7 @@ void tNMEA2000_esp32xx::initDriver()
         return;
     twai_general_config_t g_config = TWAI_GENERAL_CONFIG_DEFAULT((gpio_num_t)TxPin, (gpio_num_t)RxPin, TWAI_MODE_NORMAL);
     g_config.tx_queue_len = 20;
+    g_config.intr_flags |= ESP_INTR_FLAG_LOWMED;  // Might be needed if you run out of LEVEL1 interrupts.
     twai_timing_config_t t_config = TWAI_TIMING_CONFIG_250KBITS();
     twai_filter_config_t f_config = TWAI_FILTER_CONFIG_ACCEPT_ALL();
     esp_err_t rt = twai_driver_install(&g_config, &t_config, &f_config);
