@@ -2,14 +2,14 @@
 |===
 |Supported Targets |ESP32 |ESP32-C2 |ESP32-C3 |ESP32-S2 |ESP32-S3
 
+|ESP-IDF 4.x | Yes |?|?|?|?
 |ESP-IDF 5.x | Yes |?|YES|?|?
 |===
 
 
 = NMEA2000_esp32 library for ESP32xx boards using twai driver =
 
-Inherited object for use NMEA2000 library for ESP32 Boards.
-See also https://github.com/ttlappalainen/NMEA2000[NMEA2000] library.
+Driver component for https://github.com/ttlappalainen/NMEA2000[NMEA2000] library for ESP32 Boards.
 
 To use this library, you will also need NMEA2000 library.
 
@@ -23,25 +23,30 @@ before including NMEA2000_CAN.h or NMEA2000_esp32xx.h
 
 A working example can be found at https://github.com/jiauka/NMEA2000-windesp32xx-idf[NMEA2000-windesp32xx-idf] library
 
-== Thanks ==
+Some tweaks to sdkconfig that are recommended:
 
-Thanks to Thomas Barth, barth-dev.de and Timo Lappalainen the implementation
-of ESP32 CAN driver. This is based on their work
+  CONFIG_TWAI_ERRATA_FIX_BUS_OFF_REC=y
+  CONFIG_TWAI_ERRATA_FIX_TX_INTR_LOST=y
+  CONFIG_TWAI_ERRATA_FIX_RX_FRAME_INVALID=y
+  CONFIG_TWAI_ERRATA_FIX_RX_FIFO_CORRUPT=y
+  CONFIG_FREERTOS_HZ=1000
+
+NOTE: CONFIG_TWAI_ERRATA_FIX_TX_INTR_LOST causes crashes!  See: https://github.com/espressif/esp-idf/issues/9697
 
 == Changes ==
-2023-06-08
-- First release, WIP, only tested in RX
-2023-06-09
-- V0.1 working on both ESP32 and ESP32c3
-2023-06-10
-- V0.2 code cleanup
+
+ * 2023-06-08 - Jaume Clarens "jiauka"
+  - First release, WIP, only tested in RX
+ * 2023-06-09 - Jaume Clarens "jiauka"
+  - V0.1 working on both ESP32 and ESP32c3
+ * 2023-06-10 - Jaume Clarens "jiauka"
+  - V0.2 code cleanup
+ * 2024-03-25 - Paul Abbott "phatpaul"
+  - Improved with error handling inspired by wellenvogel - see https://github.com/wellenvogel/esp32-nmea2000/issues/67
+ * 2024-10-25 - Paul Abbott "phatpaul"
+  - Improved with proper CAN bus recovery process. see https://github.com/phatpaul/NMEA2000_esp32xx
 
 == License ==
-
-
-2015-2022 Copyright (c) jiauka, Kave Oy, www.kave.fi  All right reserved.
-
-Author: Jaume Clarens
 
 MIT License
 
@@ -61,3 +66,10 @@ PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIG
 HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF
 CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE
 OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+== Thanks ==
+This is based on the work of:
+
+ - Timo Lappalainen "ttlappalainen"
+ - Jaume Clarens "jiauka"
+ - Andreas Vogel "wellenvogel"
